@@ -21,5 +21,8 @@ No* ir_para_proximo(No* atual);
 No* voltar_anterior(No* atual);
 void salvar_csv(No* cabeca, char* nome_arquivo);
 No* carregar_csv(char* nome_arquivo);
+void exibir_historico(No* cabeca, No* atual);
+void ler_texto(char* texto, int tamanho);
+void obter_data_hora_atual(char* data_hora, int tamanho);
 
 #endif

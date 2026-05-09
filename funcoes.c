@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include "moldes.h"
 
 // Função interna para alocar um nó na memória
@@ -18,20 +19,25 @@ No* criar_no(char* url, char* data) {
     novo->prox = NULL;
     return novo;
 }
-
-// Cria uma lista inicial padrão com 10 posições vazias
-No* inicializar_lista_vazia() {
-    No* cabeca = criar_no("[Vazio]", "--/--/---- --:--");
-    No* atual = cabeca;
-    for (int i = 1; i < 10; i++) {
-        No* novo = criar_no("[Vazio]", "--/--/---- --:--");
-        atual->prox = novo;
-        novo->ant = atual;
-        atual = novo;
+void ler_texto(char* url, int tamanho) {
+    if (fgets(url, tamanho, stdin)) {
+        url[strcspn(url, "\n")] = '\0';
+    } else {
+        url[0] = '\0';
     }
-    return cabeca;
 }
 
+void obter_data_hora_atual(char* data_hora, int tamanho) {
+    time_t agora = time(NULL);
+    struct tm* momento = localtime(&agora);
+    if (momento) {
+        strftime(data_hora, tamanho, "%d/%m/%Y %H:%M", momento);
+    } else {
+        strncpy(data_hora, "--/--/---- --:--", tamanho - 1);
+        data_hora[tamanho - 1] = '\0';
+    }
+}
+    
 // Função: editar endereço
 void editar_endereco(No* atual, char* nova_url, char* nova_data) {
     if (atual != NULL) {
@@ -48,7 +54,7 @@ No* ir_para_proximo(No* atual) {
     if (atual != NULL && atual->prox != NULL) {
         return atual->prox;
     }
-    printf("\n[Aviso] Fim do histórico. Não há um próximo endereço.\n");
+    printf("\n[Aviso] Fim da Lista. Não há um próximo endereço.\n");
     return atual;
 }
 
@@ -57,11 +63,11 @@ No* voltar_anterior(No* atual) {
     if (atual != NULL && atual->ant != NULL) {
         return atual->ant;
     }
-    printf("\n[Aviso] Início do histórico. Não é possível voltar mais.\n");
+    printf("\n[Aviso] Início da Lista. Não é possível voltar mais.\n");
     return atual;
 }
 
-// Grava exatamente os 10 nós atuais da lista no arquivo CSV
+// Grava todos os nós da lista no arquivo CSV
 void salvar_csv(No* cabeca, char* nome_arquivo) {
     FILE* file = fopen(nome_arquivo, "w");
     if (!file) {
@@ -69,36 +75,33 @@ void salvar_csv(No* cabeca, char* nome_arquivo) {
         return;
     }
     No* temp = cabeca;
-    int cont = 0;
-    while (temp && cont < 10) {
+    while (temp) {
         fprintf(file, "%s;%s\n", temp->dado.url, temp->dado.data_hora);
         temp = temp->prox;
-        cont++;
     }
     fclose(file);
-    printf("\n[Histórico guardado com sucesso em '%s']\n", nome_arquivo);
 }
 
 // Lê os dados do CSV. Garante que a lista gerada terá sempre 10 posições.
 No* carregar_csv(char* nome_arquivo) {
     FILE* file = fopen(nome_arquivo, "r");
     if (!file) {
-        // Se o arquivo não existir, gera um histórico limpo com 10 slots
-        return inicializar_lista_vazia();
+        printf("\n[Aviso] Arquivo CSV não encontrado. Criando um histórico vazio.\n");
+        return NULL;
     }
 
     No *cabeca = NULL, *ultimo = NULL;
     char linha[2200];
     int cont = 0;
 
-    while (fgets(linha, sizeof(linha), file) && cont < 10) {
+    while (fgets(linha, sizeof(linha), file)) {
         linha[strcspn(linha, "\n")] = 0; // Remove quebras de linha indesejadas
         
         char *url = strtok(linha, ";");
         char *data = strtok(NULL, ";");
         
-        if (!url) url = "[Vazio]";
-        if (!data) data = "--/--/---- --:--";
+        if (!url) url = "";
+        if (!data) data = "";
 
         No* novo = criar_no(url, data);
         if (!cabeca) {
@@ -108,23 +111,8 @@ No* carregar_csv(char* nome_arquivo) {
             novo->ant = ultimo;
         }
         ultimo = novo;
-        cont++;
     }
     fclose(file);
-
-    // Se o arquivo CSV tiver menos de 10 registros, preenche o restante até completar 10
-    while (cont < 10) {
-        No* novo = criar_no("[Vazio]", "--/--/---- --:--");
-        if (!cabeca) {
-            cabeca = novo;
-            ultimo = novo;
-        } else {
-            ultimo->prox = novo;
-            novo->ant = ultimo;
-            ultimo = novo;
-        }
-        cont++;
-    }
 
     return cabeca;
 }
@@ -133,15 +121,15 @@ No* carregar_csv(char* nome_arquivo) {
 void exibir_historico(No* cabeca, No* atual) {
     No* temp = cabeca;
     int i = 1;
-    printf("\n========= HISTÓRICO DE NAVEGAÇÃO (MÁX 10) =========\n");
+    printf("\n========= Lista de URLs =========\n");
     while (temp) {
         if (temp == atual) {
-            printf(" -> [%d] URL: %s \n        Acesso em: %s (VOCÊ ESTÁ AQUI)\n", i, temp->dado.url, temp->dado.data_hora);
+            printf(" -> [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
         } else {
-            printf("    [%d] URL: %s \n        Acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
+            printf("    [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
         }
         temp = temp->prox;
         i++;
     }
-    printf("===================================================\n");
+    printf("==========================================\n");
 }
