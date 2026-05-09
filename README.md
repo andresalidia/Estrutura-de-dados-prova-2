@@ -1,44 +1,44 @@
 # Navegador de Histórico (Lista Duplamente Encadeada)
 
-Este projeto foi desenvolvido como parte da disciplina de **Estrutura de Dados**. Consiste em um simulador de histórico de navegação utilizando uma **Lista Duplamente Encadeada** em linguagem C.
+Este projeto simula um histórico de navegação utilizando uma **Lista Duplamente Encadeada** em C, agora com uma arquitetura modular profissional.
 
-## 🚀 Funcionalidades Principais
-- **Avançar/Voltar:** Navegação fluida entre os registros de endereços.
-- **Editar:** Modificação da URL na posição atual com atualização automática de data e hora.
-- **Persistência:** Salvamento automático em arquivo CSV (`historicoURL.csv`).
+## 📁 Estrutura do Projeto
+- **`src/`**: Contém a implementação do código (.c) separada por responsabilidades.
+  - `main.c`: Laço principal do programa.
+  - `lista.c`: Manipulação da estrutura de dados da lista.
+  - `storage.c`: Gerenciamento de arquivos CSV e sessões.
+  - `ui.c`: Interface de usuário e menus.
+  - `logica.c`: Algoritmos de busca, ordenação e tags.
+- **`include/`**: Arquivos de cabeçalho (.h).
+- **`data/`**: Onde os arquivos de histórico de cada sessão são armazenados.
 
-## ✨ Inovações e Melhorias Avançadas
-Para elevar a qualidade técnica e usabilidade do projeto, as seguintes inovações foram implementadas:
-
-1.  **Paginação Elegante (Automática):** A interface exibe o histórico em blocos de 5 itens por vez. O sistema detecta a posição do cursor (`->`) e alterna automaticamente entre a **Página 1** e a **Página 2**, mantendo o terminal organizado.
-2.  **Sistema de Favoritos (`stdbool.h`):** Implementação de um marcador booleano para URLs favoritas. Itens favoritados são destacados visualmente com uma estrela `[★]`.
-3.  **Busca e Filtros Inteligentes:** Um sub-menu de pesquisa que permite filtrar o histórico por:
-    - **Palavra-chave:** Busca trechos de texto na URL.
-    - **Data de Acesso:** Filtra registros por um dia específico (ex: `09/05/2026`).
-    - **Favoritos:** Exibe apenas a lista de sites marcados como favoritos.
-4.  **Exclusão Flexível:** Opção de limpar apenas o registro atual (resetando para "Vazia") ou realizar um "Wipe" completo em todo o histórico.
-5.  **Persistência de Dados Evoluída:** O arquivo CSV salva URLs, datas e o status de favoritos, mantendo a integridade dos dados entre sessões.
-6.  **Interface CLI Refinada:**
-    - Limpeza automática do terminal (`system("cls")`) a cada interação.
-    - Sistema de pausas para leitura de mensagens de confirmação e erro.
-7.  **Arquitetura Modular Profissional:** Separação clara entre a lógica principal (`main.c`) e o módulo de funções (`funcoes.c`/`funcoes.h`).
+## ✨ Novidades da Refatoração
+1.  **Arquitetura Modular:** Código separado em módulos lógicos para fácil manutenção.
+2.  **Timestamps Relativos:** Histórico mostra "há X minutos" ou "ontem" para melhor leitura.
+3.  **Ordenação Inteligente:** Opção de visualizar o histórico por Ordem Alfabética ou por Frequência de Acesso.
+4.  **Sistema Multi-Sessão:** Crie perfis diferentes (Trabalho, Estudo, etc) com históricos isolados.
 
 ## 🛠️ Como Compilar e Rodar
-Certifique-se de ter o `gcc` instalado em seu ambiente.
+### No Windows:
+Basta rodar o script utilitário:
+```bash
+.\compilar.bat
+```
+Ou usar o GCC manualmente:
+```bash
+gcc -I./include src/main.c src/lista.c src/storage.c src/ui.c src/logica.c -o navegador.exe
+```
 
-1.  Abra o terminal na pasta do projeto.
-2.  Compile o código:
-    ```bash
-    gcc main.c funcoes.c -o navegador.exe
-    ```
-3.  Execute a aplicação:
-    ```bash
-    .\navegador.exe
-    ```
+### No Linux/Mac:
+```bash
+gcc -I./include src/*.c -o navegador
+./navegador
+```
 
-## 📂 Estrutura de Arquivos
-- `main.c`: Lógica principal do menu e controle do fluxo.
-- `funcoes.c`: Implementação de todas as operações da lista, filtros e arquivos.
-- `funcoes.h`: Definições de tipos (structs), uso de `stdbool.h` e protótipos.
-- `.gitignore`: Configurado para ignorar `.vscode`, `.exe` e arquivos de dados locais.
-- `historicoURL.csv`: Banco de dados do histórico (formato: `url;data;favorito`).
+## 🚀 Funcionalidades
+- Navegação (Avançar/Voltar)
+- Edição de URLs
+- Sistema de Favoritos [★]
+- Tags Customizadas (até 3 por URL)
+- Busca e Filtros Avançados
+- Persistência em CSV
