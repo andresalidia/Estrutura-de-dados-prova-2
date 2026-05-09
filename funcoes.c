@@ -84,26 +84,39 @@ void salvar_csv(No* cabeca, char* nome_arquivo) {
 
 // Lê os dados do CSV. Garante que a lista gerada terá sempre 10 posições.
 No* carregar_csv(char* nome_arquivo) {
+    No *cabeca = NULL, *ultimo = NULL;
+    int cont = 0;
     FILE* file = fopen(nome_arquivo, "r");
-    if (!file) {
-        printf("\n[Aviso] Arquivo CSV não encontrado. Criando um histórico vazio.\n");
-        return NULL;
+
+    if (file) {
+        char linha[2200];
+        while (fgets(linha, sizeof(linha), file) && cont < 10) {
+            linha[strcspn(linha, "\n")] = 0; // Remove quebras de linha indesejadas
+            
+            char *url = strtok(linha, ";");
+            char *data = strtok(NULL, ";");
+            
+            if (!url) url = "";
+            if (!data) data = "";
+
+            No* novo = criar_no(url, data);
+            if (!cabeca) {
+                cabeca = novo;
+            } else {
+                ultimo->prox = novo;
+                novo->ant = ultimo;
+            }
+            ultimo = novo;
+            cont++;
+        }
+        fclose(file);
+    } else {
+        printf("\n[Aviso] Arquivo CSV não encontrado. Criando um histórico novo.\n");
     }
 
-    No *cabeca = NULL, *ultimo = NULL;
-    char linha[2200];
-    int cont = 0;
-
-    while (fgets(linha, sizeof(linha), file)) {
-        linha[strcspn(linha, "\n")] = 0; // Remove quebras de linha indesejadas
-        
-        char *url = strtok(linha, ";");
-        char *data = strtok(NULL, ";");
-        
-        if (!url) url = "";
-        if (!data) data = "";
-
-        No* novo = criar_no(url, data);
+    // Preenche a lista até completar 10 nós caso o arquivo tenha menos ou não exista
+    while (cont < 10) {
+        No* novo = criar_no("Vazia", "--/--/---- --:--");
         if (!cabeca) {
             cabeca = novo;
         } else {
@@ -111,8 +124,8 @@ No* carregar_csv(char* nome_arquivo) {
             novo->ant = ultimo;
         }
         ultimo = novo;
+        cont++;
     }
-    fclose(file);
 
     return cabeca;
 }
