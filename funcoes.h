@@ -8,9 +8,12 @@
 #ifndef FUNCOES_H
 #define FUNCOES_H
 
+#include <stdbool.h>
+
 typedef struct {
     char url[2084];
     char data_hora[20];
+    bool favorito;
 } Item;
 
 typedef struct no {
@@ -19,7 +22,7 @@ typedef struct no {
     struct no *prox;
 } No;
 
-No* criar_no(char* url, char* data);
+No* criar_no(char* url, char* data, bool fav);
 void editar_endereco(No* atual, char* nova_url, char* nova_data);
 No* ir_para_proximo(No* atual);
 No* voltar_anterior(No* atual);
@@ -31,5 +34,6 @@ void obter_data_hora_atual(char* data_hora, int tamanho);
 void pesquisar_historico(No* cabeca);
 void limpar_registro(No* no);
 void limpar_todo_historico(No* cabeca);
+void alternar_favorito(No* atual);
 
 #endif

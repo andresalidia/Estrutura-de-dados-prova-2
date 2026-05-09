@@ -11,7 +11,7 @@
 #include <time.h>
 #include "funcoes.h"
 
-No* criar_no(char* url, char* data) {
+No* criar_no(char* url, char* data, bool fav) {
     No* novo = (No*)malloc(sizeof(No));
     if (novo == NULL) {
         printf("Erro Crítico: Falha na alocação de memória!\n");
@@ -21,6 +21,7 @@ No* criar_no(char* url, char* data) {
     novo->dado.url[2083] = '\0';
     strncpy(novo->dado.data_hora, data, 19);
     novo->dado.data_hora[19] = '\0';
+    novo->dado.favorito = fav;
     novo->ant = NULL;
     novo->prox = NULL;
     return novo;
@@ -79,7 +80,7 @@ void salvar_csv(No* cabeca, char* nome_arquivo) {
     }
     No* temp = cabeca;
     while (temp) {
-        fprintf(file, "%s;%s\n", temp->dado.url, temp->dado.data_hora);
+        fprintf(file, "%s;%s;%d\n", temp->dado.url, temp->dado.data_hora, temp->dado.favorito ? 1 : 0);
         temp = temp->prox;
     }
     fclose(file);
@@ -97,11 +98,13 @@ No* carregar_csv(char* nome_arquivo) {
             
             char *url = strtok(linha, ";");
             char *data = strtok(NULL, ";");
+            char *fav_str = strtok(NULL, ";");
             
-            if (!url) url = "";
-            if (!data) data = "";
+            if (!url) url = "Vazia";
+            if (!data) data = "--/--/---- --:--";
+            bool fav = (fav_str && atoi(fav_str) == 1) ? true : false;
 
-            No* novo = criar_no(url, data);
+            No* novo = criar_no(url, data, fav);
             if (!cabeca) {
                 cabeca = novo;
             } else {
@@ -117,7 +120,7 @@ No* carregar_csv(char* nome_arquivo) {
     }
 
     while (cont < 10) {
-        No* novo = criar_no("Vazia", "--/--/---- --:--");
+        No* novo = criar_no("Vazia", "--/--/---- --:--", false);
         if (!cabeca) {
             cabeca = novo;
         } else {
@@ -132,45 +135,88 @@ No* carregar_csv(char* nome_arquivo) {
 }
 
 void exibir_historico(No* cabeca, No* atual) {
+    int pos_atual = 1;
+    No* temp_pos = cabeca;
+    while (temp_pos && temp_pos != atual) {
+        pos_atual++;
+        temp_pos = temp_pos->prox;
+    }
+
+    int pagina = (pos_atual <= 5) ? 1 : 2;
+    int inicio = (pagina == 1) ? 1 : 6;
+    int fim = (pagina == 1) ? 5 : 10;
+
+    printf("\n========= Histórico de URLs (Página %d/2) =========\n", pagina);
+    
     No* temp = cabeca;
-    int i = 1;
-    printf("\n========= Lista de URLs =========\n");
-    while (temp) {
-        if (temp == atual) {
-            printf(" -> [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
-        } else {
-            printf("    [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
+    for (int i = 1; i <= 10; i++) {
+        if (i >= inicio && i <= fim) {
+            char *marcador = (temp == atual) ? " ->" : "   ";
+            char *estrela = (temp->dado.favorito) ? " [\xe2\x98\x85]" : ""; // Estrela Unicode
+            
+            printf("%s [%d]%s URL: %s\n        Último acesso em: %s\n", 
+                   marcador, i, estrela, temp->dado.url, temp->dado.data_hora);
         }
         temp = temp->prox;
-        i++;
     }
-    printf("==========================================\n");
+    printf("===================================================\n");
 }
 
 void pesquisar_historico(No* cabeca) {
-    char termo[100];
-    printf("\nDigite o termo para pesquisa: ");
-    ler_texto(termo, sizeof(termo));
+    int op;
+    printf("\n--- BUSCA E FILTROS INTELIGENTES ---\n");
+    printf("1. Buscar por palavra-chave\n");
+    printf("2. Filtrar por data (DD/MM/AAAA)\n");
+    printf("3. Ver apenas Favoritos\n");
+    printf("0. Voltar\n");
+    printf("Escolha uma opção: ");
     
-    if (strlen(termo) == 0) return;
+    if (scanf("%d", &op) != 1) op = 0;
+    while (getchar() != '\n');
 
-    printf("\n--- Resultados da Pesquisa por '%s' ---\n", termo);
+    if (op == 0) return;
+
+    char termo[100];
+    bool encontrou = false;
     No* temp = cabeca;
     int i = 1;
-    int encontrou = 0;
-    
+
+    switch (op) {
+        case 1:
+            printf("Digite a palavra-chave: ");
+            ler_texto(termo, sizeof(termo));
+            printf("\n--- Resultados (Palavra: %s) ---\n", termo);
+            break;
+        case 2:
+            printf("Digite a data (ex: 09/05/2026): ");
+            ler_texto(termo, sizeof(termo));
+            printf("\n--- Resultados (Data: %s) ---\n", termo);
+            break;
+        case 3:
+            printf("\n--- Meus Favoritos ---\n");
+            break;
+        default:
+            return;
+    }
+
     while (temp) {
-        if (strstr(temp->dado.url, termo) != NULL && strcmp(temp->dado.url, "Vazia") != 0) {
-            printf("    [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
-            encontrou = 1;
+        bool match = false;
+        if (strcmp(temp->dado.url, "Vazia") != 0) {
+            if (op == 1 && strstr(temp->dado.url, termo)) match = true;
+            else if (op == 2 && strstr(temp->dado.data_hora, termo)) match = true;
+            else if (op == 3 && temp->dado.favorito) match = true;
+        }
+
+        if (match) {
+            char *estrela = (temp->dado.favorito) ? " [\xe2\x98\x85]" : "";
+            printf("    [%d]%s URL: %s\n        Acesso: %s\n", i, estrela, temp->dado.url, temp->dado.data_hora);
+            encontrou = true;
         }
         temp = temp->prox;
         i++;
     }
-    
-    if (!encontrou) {
-        printf("Nenhum registro encontrado.\n");
-    }
+
+    if (!encontrou) printf("Nenhum registro encontrado.\n");
     printf("---------------------------------------\n");
 }
 
@@ -178,6 +224,7 @@ void limpar_registro(No* no) {
     if (no != NULL) {
         strcpy(no->dado.url, "Vazia");
         strcpy(no->dado.data_hora, "--/--/---- --:--");
+        no->dado.favorito = false;
     }
 }
 
@@ -186,5 +233,18 @@ void limpar_todo_historico(No* cabeca) {
     while (temp) {
         limpar_registro(temp);
         temp = temp->prox;
+    }
+}
+
+void alternar_favorito(No* atual) {
+    if (atual && strcmp(atual->dado.url, "Vazia") != 0) {
+        atual->dado.favorito = !atual->dado.favorito;
+        if (atual->dado.favorito) {
+            printf("\n[Sucesso] URL marcada como favorita!\n");
+        } else {
+            printf("\n[Sucesso] URL removida dos favoritos.\n");
+        }
+    } else {
+        printf("\n[Erro] Não é possível favoritar um registro vazio.\n");
     }
 }

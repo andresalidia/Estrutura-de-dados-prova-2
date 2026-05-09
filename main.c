@@ -33,8 +33,9 @@ void exibir_menu() {
     printf(" [1] Avançar para próximo registro\n");
     printf(" [2] Voltar ao registro anterior\n");
     printf(" [3] Editar URL atual\n");
-    printf(" [4] Pesquisar no histórico\n");
+    printf(" [4] Pesquisar\n");
     printf(" [5] Excluir registro (Atual ou Todos)\n");
+    printf(" [6] Favoritar / Desfavoritar atual\n");
     printf(" [0] Sair do Navegador\n");
     printf("==========================================\n");
     printf("Escolha uma opção: ");
@@ -134,6 +135,10 @@ int main() {
                 } else {
                     printf("\n[Erro] Opção inválida.\n");
                 }
+                pausar();
+                break;
+            case 6:
+                alternar_favorito(atual);
                 pausar();
                 break;
             case 0:
