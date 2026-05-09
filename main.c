@@ -35,6 +35,8 @@ void exibir_menu() {
     printf(" [1] Avançar para próximo registro\n");
     printf(" [2] Voltar ao registro anterior\n");
     printf(" [3] Editar URL atual\n");
+    printf(" [4] Pesquisar no histórico\n");
+    printf(" [5] Excluir registro (Atual ou Todos)\n");
     printf(" [0] Sair do Navegador\n");
     printf("==========================================\n");
     printf("Escolha uma opção: ");
@@ -103,6 +105,36 @@ int main() {
                     }
                 } else {
                     printf("\n[Erro] Não há registro atual para editar.\n");
+                }
+                pausar();
+                break;
+            case 4:
+                pesquisar_historico(cabeca);
+                pausar();
+                break;
+            case 5:
+                printf("\n--- Opções de Exclusão ---\n");
+                printf("1. Excluir registro atual\n");
+                printf("2. Limpar todo o histórico\n");
+                printf("0. Cancelar\n");
+                printf("Escolha uma opção: ");
+                
+                int op_excluir;
+                if (scanf("%d", &op_excluir) != 1) op_excluir = -1;
+                while (getchar() != '\n'); // Limpa buffer
+                
+                if (op_excluir == 1) {
+                    if (atual) {
+                        limpar_registro(atual);
+                        printf("\n[Sucesso] Registro atual limpo!\n");
+                    }
+                } else if (op_excluir == 2) {
+                    limpar_todo_historico(cabeca);
+                    printf("\n[Sucesso] Todo o histórico foi apagado!\n");
+                } else if (op_excluir == 0) {
+                    printf("\n[Info] Ação cancelada.\n");
+                } else {
+                    printf("\n[Erro] Opção inválida.\n");
                 }
                 pausar();
                 break;

@@ -146,3 +146,49 @@ void exibir_historico(No* cabeca, No* atual) {
     }
     printf("==========================================\n");
 }
+
+// Função Inovação: Pesquisar por palavra-chave no histórico
+void pesquisar_historico(No* cabeca) {
+    char termo[100];
+    printf("\nDigite o termo para pesquisa: ");
+    ler_texto(termo, sizeof(termo));
+    
+    if (strlen(termo) == 0) return;
+
+    printf("\n--- Resultados da Pesquisa por '%s' ---\n", termo);
+    No* temp = cabeca;
+    int i = 1;
+    int encontrou = 0;
+    
+    while (temp) {
+        // strstr procura se "termo" está dentro de "url". Ignora nós vazios.
+        if (strstr(temp->dado.url, termo) != NULL && strcmp(temp->dado.url, "Vazia") != 0) {
+            printf("    [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
+            encontrou = 1;
+        }
+        temp = temp->prox;
+        i++;
+    }
+    
+    if (!encontrou) {
+        printf("Nenhum registro encontrado.\n");
+    }
+    printf("---------------------------------------\n");
+}
+
+// Função Inovação: Limpa (formata) um único registro
+void limpar_registro(No* no) {
+    if (no != NULL) {
+        strcpy(no->dado.url, "Vazia");
+        strcpy(no->dado.data_hora, "--/--/---- --:--");
+    }
+}
+
+// Função Inovação: Limpa todo o histórico de uma vez
+void limpar_todo_historico(No* cabeca) {
+    No* temp = cabeca;
+    while (temp) {
+        limpar_registro(temp);
+        temp = temp->prox;
+    }
+}

@@ -1,20 +1,18 @@
 #ifndef MOLDES_H
 #define MOLDES_H
 
-// Estrutura dos Itens
+
 typedef struct {
     char url[2084];
     char data_hora[20];
 } Item;
 
-// Estrutura do Nó - Lista Duplamente Encadeada
 typedef struct no {
     Item dado;
     struct no *ant;
     struct no *prox;
 } No;
 
-// Definições das funções
 No* criar_no(char* url, char* data);
 void editar_endereco(No* atual, char* nova_url, char* nova_data);
 No* ir_para_proximo(No* atual);
@@ -24,5 +22,10 @@ No* carregar_csv(char* nome_arquivo);
 void exibir_historico(No* cabeca, No* atual);
 void ler_texto(char* texto, int tamanho);
 void obter_data_hora_atual(char* data_hora, int tamanho);
+
+// Novas inovações:
+void pesquisar_historico(No* cabeca);
+void limpar_registro(No* no);
+void limpar_todo_historico(No* cabeca);
 
 #endif
