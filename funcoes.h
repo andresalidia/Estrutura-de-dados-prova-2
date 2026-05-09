@@ -1,6 +1,12 @@
-#ifndef MOLDES_H
-#define MOLDES_H
+/******************************************************************************
+ * PROJETO: Navegador de Histórico (Lista Duplamente Encadeada)
+ * DISCIPLINA: Estrutura de Dados
+ * DATA DE ENTREGA: 10/05/2026
+ * DESCRIÇÃO: Definições de estruturas e protótipos de funções.
+ ******************************************************************************/
 
+#ifndef FUNCOES_H
+#define FUNCOES_H
 
 typedef struct {
     char url[2084];
@@ -22,8 +28,6 @@ No* carregar_csv(char* nome_arquivo);
 void exibir_historico(No* cabeca, No* atual);
 void ler_texto(char* texto, int tamanho);
 void obter_data_hora_atual(char* data_hora, int tamanho);
-
-// Novas inovações:
 void pesquisar_historico(No* cabeca);
 void limpar_registro(No* no);
 void limpar_todo_historico(No* cabeca);

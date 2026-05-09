@@ -10,9 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "moldes.h"
+#include "funcoes.h"
 
-// Função auxiliar para limpar a tela de forma multiplataforma
 void limpar_tela() {
 #ifdef _WIN32
     system("cls");
@@ -21,10 +20,9 @@ void limpar_tela() {
 #endif
 }
 
-// Função auxiliar para pausar a execução até o usuário pressionar Enter
 void pausar() {
     printf("\n[Pressione ENTER para continuar...]");
-    while (getchar() != '\n'); // Consome o Enter
+    while (getchar() != '\n'); 
 }
 
 
@@ -59,9 +57,9 @@ int main() {
         salvar_csv(cabeca, "historicoURL.csv");
 
         if (scanf("%d", &opcao) != 1) {
-            opcao = -1; // Trata entrada inválida (ex: letras)
+            opcao = -1; 
         }
-        while (getchar() != '\n'); // Limpa o buffer para evitar problemas
+        while (getchar() != '\n'); 
 
         switch (opcao) {
     
@@ -121,7 +119,7 @@ int main() {
                 
                 int op_excluir;
                 if (scanf("%d", &op_excluir) != 1) op_excluir = -1;
-                while (getchar() != '\n'); // Limpa buffer
+                while (getchar() != '\n'); 
                 
                 if (op_excluir == 1) {
                     if (atual) {

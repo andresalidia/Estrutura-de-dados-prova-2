@@ -1,10 +1,16 @@
+/******************************************************************************
+ * PROJETO: Navegador de Histórico (Lista Duplamente Encadeada)
+ * DISCIPLINA: Estrutura de Dados
+ * DATA DE ENTREGA: 10/05/2026
+ * DESCRIÇÃO: Implementação das funções de manipulação da lista e arquivos.
+ ******************************************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include "moldes.h"
+#include "funcoes.h"
 
-// Função interna para alocar um nó na memória
 No* criar_no(char* url, char* data) {
     No* novo = (No*)malloc(sizeof(No));
     if (novo == NULL) {
@@ -19,6 +25,7 @@ No* criar_no(char* url, char* data) {
     novo->prox = NULL;
     return novo;
 }
+
 void ler_texto(char* url, int tamanho) {
     if (fgets(url, tamanho, stdin)) {
         url[strcspn(url, "\n")] = '\0';
@@ -38,7 +45,6 @@ void obter_data_hora_atual(char* data_hora, int tamanho) {
     }
 }
     
-// Função: editar endereço
 void editar_endereco(No* atual, char* nova_url, char* nova_data) {
     if (atual != NULL) {
         strncpy(atual->dado.url, nova_url, 2083);
@@ -49,7 +55,6 @@ void editar_endereco(No* atual, char* nova_url, char* nova_data) {
     }
 }
 
-// Função: ir para o endereço (Avançar para o próximo)
 No* ir_para_proximo(No* atual) {
     if (atual != NULL && atual->prox != NULL) {
         return atual->prox;
@@ -58,7 +63,6 @@ No* ir_para_proximo(No* atual) {
     return atual;
 }
 
-// Função: voltar ao endereço anterior
 No* voltar_anterior(No* atual) {
     if (atual != NULL && atual->ant != NULL) {
         return atual->ant;
@@ -67,7 +71,6 @@ No* voltar_anterior(No* atual) {
     return atual;
 }
 
-// Grava todos os nós da lista no arquivo CSV
 void salvar_csv(No* cabeca, char* nome_arquivo) {
     FILE* file = fopen(nome_arquivo, "w");
     if (!file) {
@@ -82,7 +85,6 @@ void salvar_csv(No* cabeca, char* nome_arquivo) {
     fclose(file);
 }
 
-// Lê os dados do CSV. Garante que a lista gerada terá sempre 10 posições.
 No* carregar_csv(char* nome_arquivo) {
     No *cabeca = NULL, *ultimo = NULL;
     int cont = 0;
@@ -91,7 +93,7 @@ No* carregar_csv(char* nome_arquivo) {
     if (file) {
         char linha[2200];
         while (fgets(linha, sizeof(linha), file) && cont < 10) {
-            linha[strcspn(linha, "\n")] = 0; // Remove quebras de linha indesejadas
+            linha[strcspn(linha, "\n")] = 0; 
             
             char *url = strtok(linha, ";");
             char *data = strtok(NULL, ";");
@@ -114,7 +116,6 @@ No* carregar_csv(char* nome_arquivo) {
         printf("\n[Aviso] Arquivo CSV não encontrado. Criando um histórico novo.\n");
     }
 
-    // Preenche a lista até completar 10 nós caso o arquivo tenha menos ou não exista
     while (cont < 10) {
         No* novo = criar_no("Vazia", "--/--/---- --:--");
         if (!cabeca) {
@@ -130,7 +131,6 @@ No* carregar_csv(char* nome_arquivo) {
     return cabeca;
 }
 
-// Mostra o estado visual da lista e onde o utilizador se encontra
 void exibir_historico(No* cabeca, No* atual) {
     No* temp = cabeca;
     int i = 1;
@@ -147,7 +147,6 @@ void exibir_historico(No* cabeca, No* atual) {
     printf("==========================================\n");
 }
 
-// Função Inovação: Pesquisar por palavra-chave no histórico
 void pesquisar_historico(No* cabeca) {
     char termo[100];
     printf("\nDigite o termo para pesquisa: ");
@@ -161,7 +160,6 @@ void pesquisar_historico(No* cabeca) {
     int encontrou = 0;
     
     while (temp) {
-        // strstr procura se "termo" está dentro de "url". Ignora nós vazios.
         if (strstr(temp->dado.url, termo) != NULL && strcmp(temp->dado.url, "Vazia") != 0) {
             printf("    [%d] URL: %s \n        Ultimo acesso em: %s\n", i, temp->dado.url, temp->dado.data_hora);
             encontrou = 1;
@@ -176,7 +174,6 @@ void pesquisar_historico(No* cabeca) {
     printf("---------------------------------------\n");
 }
 
-// Função Inovação: Limpa (formata) um único registro
 void limpar_registro(No* no) {
     if (no != NULL) {
         strcpy(no->dado.url, "Vazia");
@@ -184,7 +181,6 @@ void limpar_registro(No* no) {
     }
 }
 
-// Função Inovação: Limpa todo o histórico de uma vez
 void limpar_todo_historico(No* cabeca) {
     No* temp = cabeca;
     while (temp) {

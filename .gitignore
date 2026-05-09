@@ -1,0 +1,11 @@
+# Ignorar pasta de configurações do VS Code
+.vscode/
+
+# Ignorar executáveis compilados
+*.exe
+*.out
+*.o
+
+# Ignorar o banco de dados local
+historicoURL.csv
+historicoURL.csv.bak
