@@ -1,0 +1,13 @@
+# Ignorar configs do editor
+.vscode/
+
+# Ignorar binários
+*.exe
+*.out
+*.o
+*.bat
+
+# Ignorar banco de dados local na pasta data
+data/history_*.csv
+historicoURL.csv
+historico_*.csv
